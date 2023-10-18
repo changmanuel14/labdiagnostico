@@ -1,0 +1,174 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h4>Requisición de Insumos por parte de los usuarios</h4><hr>
+<form action="" method="POST">
+	<div class="form-row">
+		<div class="form-group col-6">
+			<label for="fecha">Fecha</label>
+			<input type="date" class="form-control" id="fecha" name="fecha" required>
+		</div>
+		<div class="form-group col-6">
+			<label for="pacientes">No. de Pacientes</label>
+			<input type="text" class="form-control" id="pacientes" name="pacientes" placeholder="No. Pacientes" required>
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-6">
+			<label for="numhojareq">Hoja de Requisición</label>
+			<input type="number" class="form-control" id="numhojareq" name="numhojareq" placeholder="Hoja de Requisición" required>
+		</div>
+		<div class="form-group col-6">
+			<input type="hidden" class="form-control" name="cantidad" id="cantidad" placeholder="  Cantidad" value="1" readonly>
+		</div>
+	</div>
+    <hr>
+	<h6>Listado de insumos:</h6>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Insumo</th>
+                <th>Presentación</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody id="container">
+            <tr>
+                <td><input type="text" id="codigo0" name="codigo0" class="form-control" placeholder="Código" onchange="funcion(0)" list="listado1" autocomplete="off" required></td>
+                <td><input type="text" id="nombre0" name="nombre0" class="form-control" placeholder="Nombre" onchange="funcion1(0)" list="listado" autocomplete="off"></td>
+                <td><input type="text" id="presentacion0" name="presentacion0" class="form-control" placeholder="Presentación" readonly></td>
+                <td><input type="number" class="form-control" name="cantidad0" id="cantidad0" step="0.01" placeholder="Cantidad"></td>
+            </tr>
+        </tbody>
+    </table><br>
+
+    <center>
+		<button type="button" class="btn btn-success" onclick="agregar()">Agregar Fila</button> 
+		<input class="btn btn-primary" type="submit" value="Guardar Datos">
+	</center>
+
+
+</form>
+<datalist id="listado">
+    {% for i in insumos %}
+    <option>{{i[1]}}</option>
+    {% endfor %}
+</datalist>
+<datalist id="listado1">
+    {% for i in insumos %}
+    <option>{{i[0]}}</option>
+    {% endfor %}
+</datalist>
+<script type="text/javascript">
+    function agregar(){
+        var cant = document.getElementById("cantidad").value;
+        cant = parseInt(cant);
+        var tr = document.createElement('tr')
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'codigo' + String(cant);
+        input.id = 'codigo' + String(cant);
+        input.className = 'form-control';
+        input.placeholder = "Código";
+        input.setAttribute('onchange', 'funcion('+String(cant)+')');
+        input.setAttribute('list', 'listado1');
+        input.autocomplete = 'off';
+        input.required = true;
+        var input1 = document.createElement('input');
+        input1.type = 'text';
+        input1.name = 'nombre' + String(cant);
+        input1.id = 'nombre' + String(cant);
+        input1.className = 'form-control';
+        input1.placeholder = "Nombre";
+        input1.setAttribute('onchange', 'funcion1('+String(cant)+')');
+        input1.setAttribute('list', 'listado');
+        input1.autocomplete = 'off';
+        input1.required = true;
+        var input2 = document.createElement('input');
+        input2.type = 'text';
+        input2.name = 'presentacion' + String(cant);
+        input2.id = 'presentacion' + String(cant);
+        input2.className = 'form-control';
+        input2.placeholder = "Presentación";
+        input2.readOnly = 'on';
+        input2.required = true;
+        var input3 = document.createElement('input');
+        input3.type = 'number';
+        input3.step = '0.01'
+        input3.name = 'cantidad' + String(cant);
+        input3.id = 'cantidad' + String(cant);
+        input3.className = 'form-control';
+        input3.placeholder = "Cantidad";
+        input3.required = true;
+
+        var container = document.getElementById('container');
+        container.append(tr);
+        var td = document.createElement('td')
+        tr.append(td)
+        td.append(input);
+        var td1 = document.createElement('td')
+        tr.append(td1)
+        td1.append(input1);
+        var td2 = document.createElement('td')
+        tr.append(td2)
+        td2.append(input2);
+        var td3 = document.createElement('td')
+        tr.append(td3)
+        td3.append(input3);
+        cant = cant + 1;
+        document.getElementById("cantidad").value = cant;
+    }
+</script>
+<script type="text/javascript">
+    function funcion(num) {
+        // Declare variables
+        var arreglo = {{ insumos|tojson }}
+        var conteo = Object.keys(arreglo).length;
+        var aux = "codigo" + num
+        var aux1 = "nombre" + num
+        var aux2 = "presentacion" + num
+        var encontro = 0;
+        for(var j = 0; j<conteo;j++){
+            var valor = document.getElementById(aux).value
+            if (arreglo[j][0] == valor) {
+                var nombre = String(arreglo[j][1]);
+                var presentacion = String(arreglo[j][2]);
+                document.getElementById(aux2).value = presentacion;
+                document.getElementById(aux1).value = nombre;
+                encontro = 1;
+            }
+        }
+
+        if (encontro == 0){
+            document.getElementById(aux1).value = "";
+            document.getElementById(aux2).value = "";
+        }
+      }
+      function funcion1(num) {
+        // Declare variables
+        var arreglo = {{ insumos|tojson }};
+        var conteo = Object.keys(arreglo).length;
+        var aux = "codigo" + num
+        var aux1 = "nombre" + num
+        var aux2 = "presentacion" + num
+        var encontro = 0;
+        for(var j = 0; j<conteo;j++){
+            var valor = document.getElementById(aux1).value
+            if (arreglo[j][1] == valor) {
+                var nombre = String(arreglo[j][0]);
+                var existencia = String(arreglo[j][2]);
+                document.getElementById(aux2).value = existencia;
+                document.getElementById(aux).value = nombre;
+                encontro = 1;
+            }
+        }
+
+        if (encontro == 0){
+            document.getElementById(aux1).value = "";
+            document.getElementById(aux2).value = "";
+        }
+      }
+</script>
+
+{% endblock %}

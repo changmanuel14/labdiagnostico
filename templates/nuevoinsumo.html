@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+    <center><h1>Nuevo insumo</h1></center>
+        <hr>
+        <form action="" method="POST">
+			<div class="form-row">
+				<div class="col-md-6">
+					<input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre">
+				</div>
+				<div class="col-md-6">
+					<input type="text" id="presentacion" name="presentacion" class="form-control" placeholder="Presentación">
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="col-md-6">
+					<select name="tipo" id="tipo" class="form-control">
+						<option value="">Seleccione Tipo</option>
+						{% for i in tipos %}
+						<option value="{{i[0]}}">{{i[1]}}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="col-md-6">
+					<input type="number" step="0.01" id="cantidad" name="cantidad" class="form-control" placeholder="Cantidad">
+				</div>
+			</div><br>
+			<center>
+				<input class="btn btn-primary" type="submit" value="Aceptar">
+			</center>
+</form>
+{% endblock %}

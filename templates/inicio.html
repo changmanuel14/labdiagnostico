@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>Bienvenido</h1>
+    <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+    <table class="sortable table table-stripped">
+        <tr>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Presentacion</th>
+            <th>Tipo</th>
+            <th>Existencia</th>
+        </tr>
+        {% for i in insumos %}
+        <tr>
+            <td>{{i[0]}}</td>
+            <td>{{i[1]}}</td>
+            <td>{{i[2]}}</td>
+            <td>{{i[3]}}</td>
+            <td>{{i[4]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

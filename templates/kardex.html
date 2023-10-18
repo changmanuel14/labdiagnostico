@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>Kardex</h1>
+    <form action="" method="POST">
+		<div class="form-row">
+			<div class="form-group col-6">
+				<input type="text" id="codigo" name="codigo" class="form-control" placeholder="Código" onchange="funcion()" autocomplete="off" list="listado1" required>
+			</div>
+			<div class="form-group col-6">
+				<input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre" onchange="funcion1()" autocomplete="off" list="listado">
+			</div>
+		</div>
+		<center>
+			<input class="btn btn-primary" type="submit" value="Buscar">
+			<button type="button" class="btn btn-success" onclick="PdfDownload('{{ins}}')">Generar PDF</button> 
+		</center>
+    </form>
+    <br>
+    <div id="tblinfo">
+        <center><h4>{{ins}}</h4></center>
+        <h6>Existencias actuales: {{existencia}}</h6>
+        <h6>Generado en: {{actual}}</h6>
+        <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+        <table class="sortable table table-stripped">
+            <tr>
+                <th>Razon</th>
+                <th>Documento</th>
+                <th>Fecha</th>
+                <th>Entradas</th>
+                <th>Salidas</th>
+                <th>Usuario</th>
+            </tr>
+            {% for i in data %}
+            <tr>
+                <td>{{i[0]}}</td>
+                <td>{{i[1]}}</td>
+                <td>{{i[2]}}</td>
+                <td>{{i[3]}}</td>
+                <td>{{i[4]}}</td>
+                <td>{{i[5]}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <datalist id="listado1">
+        {% for i in insumos %}
+        <option>{{i[0]}}</option>
+        {% endfor %}
+    </datalist>
+    <datalist id="listado">
+        {% for i in insumos %}
+        <option>{{i[1]}}</option>
+        {% endfor %}
+    </datalist>
+    <script type="text/javascript">
+        function funcion() {
+            // Declare variables
+            var arreglo = {{ insumos|tojson }}
+            var conteo = Object.keys(arreglo).length;
+            var aux = "codigo"
+            var aux1 = "nombre"
+            var encontro = 0;
+            for(var j = 0; j<conteo;j++){
+                var valor = document.getElementById(aux).value
+                //console.log(valor)
+                //console.log(arreglo[j][0])
+                if (arreglo[j][0] == valor) {
+                    console.log(aux1);
+                    console.log(arreglo[j][1]);
+                    var nombre = String(arreglo[j][1]);
+                    var existencia = String(arreglo[j][2]);
+                    document.getElementById(aux1).value = nombre;
+                    encontro = 1;
+                }
+            }
+            if(valor.length == 0) {
+                document.getElementById(aux1).value = "";
+            }
+    
+            if (encontro == 0){
+                document.getElementById(aux1).value = "";
+            }
+          }
+          function funcion1() {
+            // Declare variables
+            var arreglo = {{ insumos|tojson }};
+            var conteo = Object.keys(arreglo).length;
+            var aux = "codigo"
+            var aux1 = "nombre"
+            var encontro = 0;
+            for(var j = 0; j<conteo;j++){
+                var valor = document.getElementById(aux1).value
+                //console.log(valor)
+                //console.log(arreglo[j][0])
+                if (arreglo[j][1] == valor) {
+                    console.log(aux);
+                    console.log(arreglo[j][1]);
+                    var nombre = String(arreglo[j][0]);
+                    var existencia = String(arreglo[j][2]);
+                    document.getElementById(aux).value = nombre;
+                    encontro = 1;
+                }
+            }
+            if(valor.length == 0) {
+                document.getElementById(aux).value = "";
+            }
+    
+            if (encontro == 0){
+                document.getElementById(aux1).value = "";
+            }
+          }
+    </script>
+    <script type="text/javascript">
+        function PdfDownload(filename){
+            kendo.drawing.drawDOM($("#tblinfo"))
+            .then(function(group){
+                return kendo.drawing.exportPDF(
+                    group,{
+                        paperSize: "auto",
+                        landscape: false,
+                        margin: "2cm",
+                        multiPage: true,
+                    });
+            })
+            .then(function(data){
+                kendo.saveAs({
+                    dataURI: data,
+                    fileName:filename
+                });
+            });
+        }
+    </script>
+{% endblock %}

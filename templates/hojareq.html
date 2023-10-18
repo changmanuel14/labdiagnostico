@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	{% if title %}
+	<title>Sistema de caja - {{ title }}</title>
+	{% else %}
+	<title>Sistema de caja</title>
+	{% endif %}
+	<link rel="icon" href="https://informatica.galileo.edu/images/favicon.ico">
+	<style type="text/css">
+		body {
+			background: #ffffff;
+			margin-top: 5rem;
+		}
+
+		table {
+			border: 0px;
+			width: 100%;
+		}
+
+		td,
+		th {
+			font-size: 14px;
+			padding-left: 8px;
+			padding-right: 8px;
+			padding-top: 0px;
+			padding-bottom: 0px;
+			height: 30px;
+		}
+
+		td {
+			border-bottom: #000000 1px solid;
+			text-align: center;
+			vertical-align: bottom;
+		}
+
+		th {
+			text-align: left;
+			vertical-align: bottom;
+		}
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			color: #000000;
+		}
+
+		p {
+			size: 12px;
+		}
+
+		.tabla {
+			border: #000000 1px solid;
+			text-align: center;
+			vertical-align: middle;
+			height: 20px;
+		}
+
+		.tdtabla {
+			border: #000000 1px solid;
+			text-align: left;
+			vertical-align: middle;
+			height: 35px;
+		}
+
+		.tdtablaev {
+			border: #000000 1px solid;
+			text-align: left;
+			vertical-align: middle;
+			height: 20px;
+		}
+	</style>
+</head>
+
+<body>
+	<main role="main" class="container">
+		<table>
+			<tr>
+				<th style="text-align: left; border: black 1px solid; width: 70%">Apoyo en Salud y Educación S.A.<br>Laboratorios de Diagnóstico Galileo<br>Requisición de Insumos por parte de los usuarios</th>
+				<th style="text-align: left; border: black 1px solid; width: 70%">Hoja de Requisición<br><br>Número: </th>
+			</tr>
+		</table>
+		<table style="margin-top: 5px;">
+			<tr>
+				<th style="width: 15%;">Fecha y Hora:</th>
+				<td style="width: 35%;"></td>
+				<th style="width: 15%;">No. de Pacientes:</th>
+				<td style="width: 35%;"></td>
+			</tr>
+		</table>
+		<table class="tabla" style="margin-top: 5px;">
+			<tr>
+				<th colspan="4" style="text-align: center; border: black 1px solid">Listado de Pacientes</th>
+			</tr>
+			<tr>
+				<th style="width: 5%;border: black 1px solid">No.</th>
+				<th style="width: 35%;border: black 1px solid">Nombre</th>
+				<th style="width: 30%;border: black 1px solid">Categoria</th>
+				<th style="width: 30%;border: black 1px solid">Examen</th>
+			</tr>
+			{% for i in range(5) %}
+			<tr>
+				<td class="tdtabla">{{i+1}}</td>
+				<td class="tdtabla"></td>
+				<td class="tdtabla"></td>
+				<td class="tdtabla"></td>
+			</tr>
+			{% endfor %}
+		</table>
+		<table class="tabla" style="margin-top: 5px;">
+			<tr>
+				<th colspan="5" style="text-align: center; border: black 1px solid">Listado de Insumos</th>
+			</tr>
+			<tr>
+				<th style="width: 5%;border: black 1px solid">No.</th>
+				<th style="width: 25%;border: black 1px solid">Código</th>
+				<th style="width: 25%;border: black 1px solid">Insumo</th>
+				<th style="width: 25%;border: black 1px solid">Unidad de Medida</th>
+				<th style="width: 20%;border: black 1px solid">Cantidad</th>
+			</tr>
+			{% for i in range(15) %}
+			<tr>
+				<td class="tdtabla">{{i+1}}</td>
+				<td class="tdtabla"></td>
+				<td class="tdtabla"></td>
+				<td class="tdtabla"></td>
+				<td class="tdtabla"></td>
+			</tr>
+			{% endfor %}
+		</table>
+		<table style="margin-top: 5px;">
+			<tr>
+				<th style="width: 10%;">Observaciones</th>
+				<td></td>
+			</tr>
+			<tr>
+				<td colspan="2"></td>
+			</tr>
+			<tr>
+				<td colspan="2"></td>
+			</tr>
+		</table>
+		<table style="margin-top: 5px;">
+			<tr>
+				<th class="tabla">Hecho Por:</th>
+				<th class="tabla">Revisado Por:</th>
+				<th class="tabla">Operado Por:</th>
+				<th class="tabla">Auditoria:</th>
+			</tr>
+			<tr>
+				<td class="tdtabla">Nombre:<br>Firma y sello:<br><br><br>Puesto:</td>
+				<td class="tdtabla">Nombre:<br>Firma y sello:<br><br><br>Puesto:</td>
+				<td class="tdtabla">Nombre:<br>Firma y sello:<br><br><br>Puesto:</td>
+				<td class="tdtabla">Nombre:<br>Firma y sello:<br><br><br>Puesto:</td>
+			</tr>
+		</table>
+	</main>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+		integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+		integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+		crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/20d4419baa.js" crossorigin="anonymous"></script>
+</body>
+
+</html>

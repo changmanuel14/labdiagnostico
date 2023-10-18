@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+    <center><h1>Nuevo usuario</h1></center>
+        <hr>
+        <form action="" method="POST">
+			<div class="form-row">
+				<div class="form-group col-12">
+					<label for="tipouser">Tipo de Usuario*</label>
+					<select name="tipouser" id="tipouser" class="form-control" required>
+						<option value="">Seleccione Tipo</option>
+						{% for i in tipos %}
+						<option value="{{i[0]}}">{{i[1]}}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-6">
+					<label for="nombre">Nombre*</label>
+					<input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre" required>
+				</div>
+				<div class="form-group col-6">
+					<label for="user">Usuario*</label>
+					<input type="text" id="user" name="user" class="form-control" placeholder="Usuario" required>
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="col-md-6">
+					<label for="pwd">Nueva Contraseña*</label>
+					<input type="password" id="pwd" name="pwd" class="form-control" placeholder="Contraseña" required>
+				</div>
+				<div class="col-md-6">
+					<label for="confirm_password">Confirmar Contraseña*</label>
+					<input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirmar Contraseña">
+					<small id="password_match_message" class="form-text text-muted"></small>
+				</div>
+			</div>
+			<br>
+			<center>
+				<input class="btn btn-primary" type="submit" value="Aceptar">
+			</center>
+</form>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const passwordField = document.getElementById('pwd');
+		const confirmField = document.getElementById('confirm_password');
+		const message = document.getElementById('password_match_message');
+
+		confirmField.addEventListener('input', function() {
+			if (confirmField.value === passwordField.value) {
+				message.textContent = 'Las contraseñas coinciden.';
+				message.classList.remove('text-danger');
+				message.classList.add('text-success');
+			} else {
+				message.textContent = 'Las contraseñas no coinciden.';
+				message.classList.remove('text-success');
+				message.classList.add('text-danger');
+			}
+		});
+	});
+</script>
+    
+{% endblock %}
