@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>Documentos de Pedidos</h1>
+    <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+    <table class="sortable">
+        <tr>
+            <th>No.</th>
+            <th>Documento</th>
+            <th>Pedido</th>
+            <th>Fecha</th>
+            <th>Factura</th>
+            <th>Boleta</th>
+        </tr>
+        {% for i in range(cantidad) %}
+        <tr>
+			<td>{{ loop.index }}</td>
+            <td>{{facturas[i][0]}}</td>
+            <td>{{facturas[i][1]}}</td>
+            <td>{{facturas[i][2]}}</td>
+            <td>
+				{% if existendocumentos[i][0] == 0 or existendocumentos[i][0] == '0' %}
+				<a href="/subirdocumentos/{{facturas[i][0]}}%260"><button type="button" style="width: 100%;" class="btn btn-primary">Subir<br>factura</button></a>
+				{% else %}
+				<a href="/verdocumento/factura_{{facturas[i][0]}}" target="_blank"><button type="button" style="width: 100%;" class="btn btn-success">Ver<br>factura</button></a>
+				{% endif %}
+			</td>
+            <td>
+				{% if existendocumentos[i][1] == 0 or existendocumentos[i][1] == '0' %}
+				<a href="/subirdocumentos/{{facturas[i][0]}}%260"><button type="button" style="width: 100%;" class="btn btn-primary">Subir<br>boleta</button></a>
+				{% else %}
+				<a href="/verdocumento/boleta_{{facturas[i][0]}}" target="_blank"><button type="button" style="width: 100%;" class="btn btn-success">Ver<br>boleta</button></a>
+				{% endif %}
+			</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

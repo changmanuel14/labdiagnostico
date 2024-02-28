@@ -12,7 +12,9 @@
 		</div>
 		<center>
 			<input class="btn btn-primary" type="submit" value="Buscar">
-			<button type="button" class="btn btn-success" onclick="PdfDownload('{{ins}}')">Generar PDF</button> 
+			{% if idinsumo != 0 %}
+			<a href="/imprimirkardex/{{idinsumo}}" target="_blank"><button type="button" class="btn btn-success">Generar PDF</button></a>
+			{% endif %}
 		</center>
     </form>
     <br>
@@ -104,30 +106,9 @@
             if(valor.length == 0) {
                 document.getElementById(aux).value = "";
             }
-    
             if (encontro == 0){
                 document.getElementById(aux1).value = "";
             }
           }
-    </script>
-    <script type="text/javascript">
-        function PdfDownload(filename){
-            kendo.drawing.drawDOM($("#tblinfo"))
-            .then(function(group){
-                return kendo.drawing.exportPDF(
-                    group,{
-                        paperSize: "auto",
-                        landscape: false,
-                        margin: "2cm",
-                        multiPage: true,
-                    });
-            })
-            .then(function(data){
-                kendo.saveAs({
-                    dataURI: data,
-                    fileName:filename
-                });
-            });
-        }
     </script>
 {% endblock %}

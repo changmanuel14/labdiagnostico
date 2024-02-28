@@ -1,15 +1,20 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, Response, session, send_from_directory, make_response
 import os
-from os import path
+from os import path, getcwd
 import pymysql
 from datetime import date, datetime
 import pdfkit
 from operator import attrgetter
+from PIL import Image
+from fpdf import FPDF
 from conexion import Conhost, Conuser, Conpassword, Condb
 
 app = Flask(__name__)
 app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+mi_string = chr(92)
+PATH_FILE = getcwd() + f'{mi_string}static{mi_string}documentos{mi_string}'
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -188,13 +193,9 @@ def kardex():
 	data = []
 	ins = ""
 	existencia = 0
+	idinsumo = 0
 	fechaactual = datetime.now()
-	dia = str(fechaactual.day).rjust(2, '0')
-	mes = str(fechaactual.month).rjust(2, '0')
-	anio = str(fechaactual.year).rjust(2, '0')
-	hora = str(fechaactual.hour).rjust(2, '0')
-	minuto = str(fechaactual.minute).rjust(2, '0')
-	actual = dia + '-' + mes + '-' + anio + ' ' + hora + ':' + minuto
+	actual = fechaactual.strftime("%d/%m/%Y %H:%M")
 	try:
 		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
@@ -250,8 +251,194 @@ def kardex():
 				conexion.close()	
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 			print("Ocurrió un error al conectar: ", e)
-		return render_template('kardex.html', title='Kardex', logeado=logeado, idtipouser = idtipouser, insumos=insumostotales, data=data, ins=ins, existencia=existencia, actual=actual)
-	return render_template('kardex.html', title='Kardex', logeado=logeado, idtipouser = idtipouser, insumos=insumostotales, data=data, ins=ins, existencia=existencia, actual=actual)
+		return render_template('kardex.html', title='Kardex', logeado=logeado, idtipouser = idtipouser, insumos=insumostotales, data=data, ins=ins, existencia=existencia, actual=actual, idinsumo = idinsumo)
+	return render_template('kardex.html', title='Kardex', logeado=logeado, idtipouser = idtipouser, insumos=insumostotales, data=data, ins=ins, existencia=existencia, actual=actual, idinsumo = idinsumo)
+
+@app.route("/imprimirkardex/<idinsumo>")
+def imprimirkardex(idinsumo):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	fechaactual = datetime.now()
+	actual = fechaactual.strftime("%d/%m/%Y %H:%M")
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = "select idinsumos, existencia, codigo, nombre from insumos where activo = 1 and idinsumos = %s;"
+				cursor.execute(consulta, idinsumo)
+				insumo = cursor.fetchall()
+				print(insumo)
+				existencia = insumo[0][1]
+				codigo = insumo[0][2]
+				ins = insumo[0][3]
+				idinsumo = insumo[0][0]
+				consulta = 'select "Hoja de requisición", e.numhojareq, DATE_FORMAT(e.fecha,"%d/%m/%Y"), d.cantidad, u.nombre from egresosheader e inner join egresosdesc d on e.idegresosheader = d.idegresosheader inner join users u on u.idusers = d.iduser where d.idinsumo = ' + str(idinsumo) + " order by e.fecha desc;"
+				cursor.execute(consulta)
+				datae = cursor.fetchall()
+				consulta = "select h.nombreordencompra, h.documento, DATE_FORMAT(h.fecha,'%d/%m/%Y'), d.cantidad, u.nombre from ingresosheader h inner join ingresosdesc d ON h.idingresosheader = d.idheader inner join users u ON h.user = u.idusers where d.idinsumos = " + str(idinsumo) + " order by h.fecha desc;"
+				cursor.execute(consulta)
+				datai = cursor.fetchall()
+				data = []
+				for i in range(len(datae)):
+					aux = datae[i]
+					aux = list(aux)
+					aux.insert(3, " ")
+					data.append(aux)
+				
+				for i in range(len(datai)):
+					aux = datai[i]
+					aux = list(aux)
+					aux.insert(4, " ")
+					data.append(aux)
+				
+				cantdata = len(data)
+				for i in range(cantdata-1):
+					for j in range(cantdata-i-1):
+						dia1, mes1, anio1 = [int(x) for x in data[j][2].split('/')]
+						dia2, mes2, anio2 = [int(x) for x in data[j+1][2].split('/')]
+						fecha1 = date(anio1, mes1, dia1)
+						fecha2 = date(anio2, mes2, dia2)
+						if fecha1 <  fecha2:
+							data[j], data[j+1] = data[j+1], data[j]
+		finally:
+			conexion.close()	
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	rendered = render_template('imprimirkardex.html', title='Impresión de Kardex', logeado=logeado, idtipouser = idtipouser, data=data, ins=ins, existencia=existencia, actual=actual, idinsumo = idinsumo)
+	options = {'enable-local-file-access': None, 'page-size': 'Letter','margin-right': '10mm'}
+	config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
+	pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+	response = make_response(pdf)
+	response.headers['Content-Type'] = 'application/pdf'
+	response.headers['Content-Disposition'] = f'inline; filename=kardex{idinsumo}.pdf'
+	print(response)
+	return response
+
+@app.route("/documentosingresos")
+def documentosingresos():
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	print(PATH_FILE)
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				cursor.execute("select documento, nombreordencompra, fecha from ingresosheader group by documento order by fecha desc;")
+			# Con fetchall traemos todas las filas
+				facturas = cursor.fetchall()
+				cantidad = len(facturas)
+				existendocumentos = []
+				for i in facturas:
+					factura = 0
+					boleta = 0
+					nombrefactura = PATH_FILE + f"factura_{i[0]}.pdf"
+					nombreboleta = PATH_FILE + f"boleta_{i[0]}.pdf"
+					if path.exists(nombrefactura):
+						factura = 1
+					if path.exists(nombreboleta):
+						boleta = 1
+					aux = [factura, boleta]
+					existendocumentos.append(aux)
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return render_template('documentosingresos.html', title='Documentos de ingresos', facturas = facturas, logeado=logeado, idtipouser = idtipouser, existendocumentos = existendocumentos, cantidad = cantidad)
+
+@app.route("/subirdocumentos/<nomfactura>&<mensaje>", methods=['GET', 'POST'])
+def subirdocumentos(nomfactura, mensaje):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	factura = 0
+	boleta = 0
+	nombrefactura = PATH_FILE + f"factura_{nomfactura}.pdf"
+	nombreboleta = PATH_FILE + f"boleta_{nomfactura}.pdf"
+	if path.exists(nombrefactura):
+		factura = 1
+	if path.exists(nombreboleta):
+		boleta = 1
+	if request.method == 'POST':
+		if factura == 0:
+			try:
+				archivofactura = request.files['factura']
+				if archivofactura.filename != '':
+					if ".pdf" not in archivofactura.filename:
+						if archivofactura.filename.split('.')[-1].lower() not in ['jpg', 'jpeg', 'png', 'gif']:
+							mensaje = 1
+							return redirect(url_for('subirdocumentos', nomfactura = nomfactura, mensaje = mensaje))
+						else:
+							archivofactura.save('temp.png')
+							if archivofactura.filename.split('.')[-1].lower() == 'png':
+								img = Image.open('temp.png')
+								rgb_img = img.convert('RGB')
+								rgb_img.save('temp.jpg')
+								imagen_path = 'temp.jpg'
+							else:
+								imagen_path = 'temp.png'
+							pdf = FPDF('P', 'mm', 'Letter')  # Ajustar a tamaño Carta
+							pdf.add_page()
+							pdf.image(imagen_path, 0, 0, 215.9, 279.4)
+							pdf.output(path.join(PATH_FILE, f"factura_{nomfactura}.pdf"), 'F')
+							os.remove(imagen_path)
+					else:
+						archivofactura.save(path.join(PATH_FILE, f"factura_{nomfactura}.pdf"))
+			except:
+				print("No subió documento factura")
+		if boleta == 0:
+			try:
+				archivoboleta = request.files['boleta']
+				if archivoboleta.filename != '':
+					if ".pdf" not in archivoboleta.filename:
+						if archivoboleta.filename.split('.')[-1].lower() not in ['jpg', 'jpeg', 'png', 'gif']:
+							mensaje = 1
+							return redirect(url_for('subirdocumentos', nomfactura = nomfactura, mensaje = mensaje))
+						else:
+							archivoboleta.save('temp.png')
+							if archivoboleta.filename.split('.')[-1].lower() == 'png':
+								img = Image.open('temp.png')
+								rgb_img = img.convert('RGB')
+								rgb_img.save('temp.jpg')
+								imagen_path = 'temp.jpg'
+							else:
+								imagen_path = 'temp.png'
+							pdf = FPDF('P', 'mm', 'Letter')  # Ajustar a tamaño Carta
+							pdf.add_page()
+							print("Llego")
+							pdf.image(imagen_path, 0, 0, 215.9, 279.4)
+							pdf.output(path.join(PATH_FILE, f"boleta_{nomfactura}.pdf"), 'F')
+							os.remove(imagen_path)
+					else:
+						archivoboleta.save(path.join(PATH_FILE, f"boleta_{nomfactura}.pdf"))
+			except:
+				print("No subió documento orden")
+		return redirect(url_for('documentosingresos'))
+	return render_template('subirdocumentos.html', title='Adjuntar documentos', logeado=logeado, factura=factura, boleta = boleta, mensaje = mensaje)
+
+@app.route("/verdocumento/<nombredocumento>", methods=['GET', 'POST'])
+def verdocumento(nombredocumento):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	return render_template('verdocumento.html', title='Visualización de Documento', logeado=logeado, nombredocumento = nombredocumento)
 
 @app.route("/egresoinsumos", methods=['GET', 'POST'])
 def egresoinsumos():

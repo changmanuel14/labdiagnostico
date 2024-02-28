@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	{% if title %}
+	<title>Sistema de Inventario - {{ title }}</title>
+	{% else %}
+	<title>Sistema de Inventario</title>
+	{% endif %}
+	<link rel="icon" href="https://informatica.galileo.edu/images/favicon.ico">
+	<style type="text/css">
+		body {
+			background: #ffffff;
+			margin-top: 5rem;
+		}
+
+		table {
+			border: 0px;
+			width: 100%;
+		}
+
+		td,
+		th {
+			font-size: 14px;
+			padding-left: 8px;
+			padding-right: 8px;
+			padding-top: 0px;
+			padding-bottom: 0px;
+			height: 30px;
+		}
+
+		td {
+			border-bottom: #000000 1px solid;
+			text-align: center;
+			vertical-align: bottom;
+		}
+
+		th {
+			text-align: left;
+			vertical-align: bottom;
+		}
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			color: #000000;
+		}
+
+		p {
+			size: 12px;
+		}
+
+		.tabla {
+			border: #000000 1px solid;
+			text-align: center;
+			vertical-align: middle;
+			height: 20px;
+		}
+
+		.tdtabla {
+			border: #000000 1px solid;
+			text-align: left;
+			vertical-align: middle;
+			height: 35px;
+		}
+
+		.tdtablaev {
+			border: #000000 1px solid;
+			text-align: left;
+			vertical-align: middle;
+			height: 20px;
+		}
+	</style>
+</head>
+
+<body>
+	<main role="main" class="container">
+		<table>
+			<tr>
+				<th style="text-align: left; border: black 1px solid; width: 100%">Apoyo en Salud y Educación S.A.<br>Laboratorios de Diagnóstico Galileo<br>Kardex de Insumo</th>
+			</tr>
+		</table>
+		<center>
+			<h1>Kardex</h1>
+			<h2>{{ins}}</h2>
+		</center>
+		<h6>Existencias actuales: {{existencia}}</h6>
+		<h6>Generado en: {{actual}}</h6>
+		<table class="tabla">
+            <tr>
+                <th style="border: #000000 1px solid;">Razon</th>
+                <th style="border: #000000 1px solid;">Documento</th>
+                <th style="border: #000000 1px solid;">Fecha</th>
+                <th style="border: #000000 1px solid;">Entradas</th>
+                <th style="border: #000000 1px solid;">Salidas</th>
+                <th style="border: #000000 1px solid;">Usuario</th>
+            </tr>
+            {% for i in data %}
+            <tr>
+                <td class="tdtabla">{{i[0]}}</td>
+                <td class="tdtabla">{{i[1]}}</td>
+                <td class="tdtabla">{{i[2]}}</td>
+                <td class="tdtabla">{{i[3]}}</td>
+                <td class="tdtabla">{{i[4]}}</td>
+                <td class="tdtabla">{{i[5]}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+	</main>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+		integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+		integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+		crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/20d4419baa.js" crossorigin="anonymous"></script>
+</body>
+
+</html>
