@@ -96,7 +96,7 @@
 					<div class="navbar-nav mr-auto">
 						<li><a class="nav-item nav-link" href="/">Inicio</a></li>
 						{% if logeado == 1 %}
-						{% if idtipouser == 1 %}
+						
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -104,11 +104,14 @@
 							</a>
 							<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<a class="dropdown-item" href="/nuevoinsumo">Nuevo</a>
+								{% if idtipouser == 1 %}
 								<div class="dropdown-divider"></div>
 								<a class="dropdown-item" href="/hojareq" target=”_blank”>Imprimir hoja de requisición</a>
 								<a class="dropdown-item" href="/hojaingresoextra" target=”_blank”>Imprimir hoja de ingresos extraordinarios</a>
+								{% endif %}
 							</div>
 						</li>
+						{% if idtipouser == 1 %}
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
