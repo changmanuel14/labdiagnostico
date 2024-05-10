@@ -14,7 +14,7 @@ app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 mi_string = chr(92)
-PATH_FILE = getcwd() + f'{mi_string}flaskapp{mi_string}static{mi_string}documentos{mi_string}'
+PATH_FILE = getcwd() + f'{mi_string}static{mi_string}documentos{mi_string}'
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
