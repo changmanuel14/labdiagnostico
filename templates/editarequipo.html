@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<center>
+	<h1>Editar equipo</h1>
+</center>
+<hr>
+<form action="" method="POST">
+	<div class="form-row">
+		<div class="col-md-12">
+			<label for="nombre">Nombre</label>
+			<input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre" value="{{equipo[0]}}">
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="col-md-12">
+			<label for="marca">Marca</label>
+			<input type="text" id="marca" name="marca" class="form-control" placeholder="Marca" value="{{equipo[1]}}">
+		</div>
+	</div>
+	<br>
+	<center><input class="btn btn-primary" type="submit" value="Aceptar"></center>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Mantenimientos</h1>
+<a href="/nuevomantenimiento/{{id}}"><button type="button" class="btn btn-success">Ingresar Nuevo Mantenimiento</button></a>
+
+<h4>Equipo: {{equipo[0]}}</h4>
+<h4>Código: {{equipo[1]}}</h4>
+<h4>Marca: {{equipo[2]}}</h4>
+<br>
+<table class="table table-striped sortable table-responsive" id="sampleTable">
+	<thead>
+		<tr>
+			<th>No.</th>
+			<th>Proveedor</th>
+			<th>Fecha de Mantenimiento</th>
+			<th>Documento</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for i in mantenimientos %}
+		<tr>
+			<td>{{ loop.index }}</td>
+			<td>{{i[1]}}</td>
+			<td>{{i[2]}}</td>
+			<td>
+				{% if i[3] | int == 0 %}
+				<a href="/subirdocumentomantenimiento/{{i[0]}}&0"><button type="button" style="width: 100%;"
+					class="btn btn-primary">Subir<br>documento</button></a>
+				{% else %}
+				<a href="/verdocumento/mantenimiento_{{i[0]}}" target="_blank"><button type="button" style="width: 100%;"
+					class="btn btn-success">Ver<br>documento</button></a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<script>
+	$(document).ready(function () {
+		$("#sampleTable").fancyTable({
+			inputPlaceholder: 'Buscar',
+			pagination: true,
+			perPage: 20
+		});
+	});
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Equipos</h1>
+<a href="/nuevoequipo"><button type="button" class="btn btn-success">Nuevo Equipo</button></a>
+<table class="table table-striped sortable" id="sampleTable">
+	<thead>
+		<tr>
+			<th>No.</th>
+			<th>Codigo</th>
+			<th>Nombre</th>
+			<th>Marca</th>
+			{% if logeado == 1 %}
+			<th>Editar</th>
+			<th>Mantenimiento</th>
+			<th>Dar de Baja</th>
+			{% endif %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for i in equipos %}
+		{% if i[4] | int == 0 %}
+		<tr style="background-color: lightgoldenrodyellow;">
+		{% else %}
+		<tr>
+		{% endif %}
+			<td>{{ loop.index }}</td>
+			<td>{{i[2]}}</td>
+			<td>{{i[1]}}</td>
+			<td>{{i[3]}}</td>
+			{% if logeado == 1 %}
+			{% if i[4] | int == 1 %}
+			<td><a href="/editarequipo/{{i[0]}}"><button type="button" class="btn btn-primary">Editar</button></a></td>
+			<td><a href="/mantenimientos/{{i[0]}}"><button type="button" class="btn btn-success">Ver Mantenimientos</button></a></td>
+			<td><a href="/darbajaequipo/{{i[0]}}"><button type="button" class="btn btn-danger">Dar de Baja</button></a></td>
+			{% else %}
+			<td colspan="3"><center>Dado de Baja<br>Fecha: {{i[6]}}<br>Razón: {{i[5]}}</center></td>
+			{% endif %}
+			{% endif %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<script>
+	$(document).ready(function () {
+		$("#sampleTable").fancyTable({
+			inputPlaceholder: 'Buscar',
+			pagination: true,
+			perPage: 20
+		});
+	});
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+{% endblock %}

@@ -660,6 +660,248 @@ def hojaingresoextra():
 	print(response)
 	return response
 
+@app.route("/equipo")
+def equipo():
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				cursor.execute("SELECT idequipo, nombre, codigo, marca, activo, razonbaja, DATE_FORMAT(fechabaja,'%d/%m/%Y') from equipo order by codigo asc;")
+			# Con fetchall traemos todas las filas
+				equipos = cursor.fetchall()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return render_template('equipo.html', title='Equipos',equipos = equipos, logeado=logeado, idtipouser = idtipouser)
+
+@app.route("/nuevoequipo", methods=['GET', 'POST'])
+def nuevoequipo():
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	if request.method == 'POST':
+		nombre = request.form["nombre"]
+		marca = request.form["marca"]
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					consulta = "SELECT MAX(codigo) from equipo;"
+					cursor.execute(consulta)
+					maxid = cursor.fetchall()
+					maxid = maxid[0][0]
+					if maxid != None:
+						straux = ""
+						for i in range(len(maxid)):
+							if maxid[i].isnumeric():
+								straux = straux + maxid[i]
+						maxid = str(int(straux) + 1)
+						while len(maxid) < 3:
+							maxid = '0' + maxid
+						codigo = "E" + str(maxid)
+					else:
+						codigo = "E001"
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+		
+
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					consulta = "INSERT INTO equipo(nombre, codigo, marca, activo) values (%s,%s,%s,1);"
+					cursor.execute(consulta, (nombre, codigo, marca))
+				conexion.commit()
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+		return redirect(url_for('equipo'))
+	return render_template('nuevoequipo.html', title='Agregar Equipo', logeado=logeado, idtipouser = idtipouser)
+
+@app.route("/editarequipo/<id>", methods=['GET', 'POST'])
+def editarequipo(id):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = "select nombre, marca from equipo where idequipo = %s;"
+				cursor.execute(consulta, (id))
+				equipo = cursor.fetchone()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	if request.method == 'POST':
+		nombre = request.form["nombre"]
+		marca = request.form["marca"]
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					consulta = "update equipo set nombre = %s, marca = %s where idequipo = %s;"
+					cursor.execute(consulta, (nombre, marca, id))
+				conexion.commit()
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+		return redirect(url_for('equipo'))
+	return render_template('editarequipo.html', title='Editar Equipo', logeado=logeado, idtipouser = idtipouser, equipo = equipo)
+
+@app.route("/mantenimientos/<id>")
+def mantenimientos(id):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = f"SELECT idmantenimiento, proveedor, DATE_FORMAT(fecha,'%d/%m/%Y'), documento from mantenimiento where idequipo = {id} order by fecha desc;"
+				cursor.execute(consulta)
+			# Con fetchall traemos todas las filas
+				mantenimientos = cursor.fetchall()
+				consulta = "SELECT nombre, codigo, marca from equipo where idequipo = %s;"
+				cursor.execute(consulta, id)
+			# Con fetchall traemos todas las filas
+				equipo = cursor.fetchone()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return render_template('mantenimientos.html', title='Mantenimientos', mantenimientos = mantenimientos, logeado=logeado, idtipouser = idtipouser, equipo=equipo, id=id)
+
+@app.route("/nuevomantenimiento/<id>", methods=['GET', 'POST'])
+def nuevomantenimiento(id):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+	if request.method == 'POST':
+		proveedor = request.form["proveedor"]
+		fecha = request.form["fecha"]
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					consulta = "insert into mantenimiento(idequipo, fecha, documento, proveedor) values (%s, %s, 0, %s);"
+					cursor.execute(consulta, (id,fecha,proveedor))
+				# Con fetchall traemos todas las filas
+					conexion.commit()
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+		return redirect(url_for('mantenimientos', id = id))
+	return render_template('nuevomantenimiento.html', title='Nuevo Mantenimiento', logeado=logeado, idtipouser = idtipouser)
+
+@app.route("/subirdocumentomantenimiento/<idmantenimiento>&<mensaje>", methods=['GET', 'POST'])
+def subirdocumentomantenimiento(idmantenimiento, mensaje):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+		return redirect(url_for('login'))
+	existe = 0
+	nombrearchivo = PATH_FILE + f"mantenimiento_{idmantenimiento}.pdf"
+	if path.exists(nombrearchivo):
+		existe = 1
+	if request.method == 'POST':
+		if existe == 0:
+			try:
+				archivomantenimiento = request.files['documento']
+				if archivomantenimiento.filename != '':
+					if ".pdf" not in archivomantenimiento.filename:
+						if archivomantenimiento.filename.split('.')[-1].lower() not in ['jpg', 'jpeg', 'png', 'gif']:
+							mensaje = 1
+							return redirect(url_for('subirdocumentomantenimiento', idmantenimiento = idmantenimiento, mensaje = mensaje))
+						else:
+							archivomantenimiento.save('temp.png')
+							if archivomantenimiento.filename.split('.')[-1].lower() == 'png':
+								img = Image.open('temp.png')
+								rgb_img = img.convert('RGB')
+								rgb_img.save('temp.jpg')
+								imagen_path = 'temp.jpg'
+							else:
+								imagen_path = 'temp.png'
+							pdf = FPDF('P', 'mm', 'Letter')  # Ajustar a tamaño Carta
+							pdf.add_page()
+							pdf.image(imagen_path, 0, 0, 215.9, 279.4)
+							pdf.output(path.join(PATH_FILE, f"mantenimiento_{idmantenimiento}.pdf"), 'F')
+							os.remove(imagen_path)
+					else:
+						archivomantenimiento.save(path.join(PATH_FILE, f"mantenimiento_{idmantenimiento}.pdf"))
+					try:
+						conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+						try:
+							with conexion.cursor() as cursor:
+								consulta = "update mantenimiento set documento = 1 where idmantenimiento = %s;"
+								cursor.execute(consulta, (idmantenimiento))
+							# Con fetchall traemos todas las filas
+								conexion.commit()
+						finally:
+							conexion.close()
+					except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+						print("Ocurrió un error al conectar: ", e)
+			except:
+				print("No subió documento del mantenimiento")
+		return redirect(url_for('equipo'))
+	return render_template('subirdocumentomantenimiento.html', title='Adjuntar documentos', logeado=logeado, mensaje = mensaje, idtipouser = idtipouser)
+
+@app.route("/darbajaequipo/<id>", methods=['GET', 'POST'])
+def darbajaequipo(id):
+	try:
+		logeado = session['logeadoldd']
+		idtipouser = session['idtipouserldd']
+	except:
+		logeado = 0
+		idtipouser = 0
+	if request.method == 'POST':
+		razon = request.form["razon"]
+		fecha = request.form["fecha"]
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					consulta = "update equipo set activo = 0, razonbaja = %s, fechabaja = %s where idequipo = %s;"
+					cursor.execute(consulta, (razon, fecha, id))
+				# Con fetchall traemos todas las filas
+					conexion.commit()
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+		return redirect(url_for('equipo'))
+	return render_template('darbajaequipo.html', title='Dar Baja a Equipo', logeado=logeado, idtipouser = idtipouser)
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5006)
